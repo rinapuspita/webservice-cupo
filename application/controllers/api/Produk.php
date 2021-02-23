@@ -10,12 +10,11 @@
         {
             parent::__construct();
             $this->load->model('Produk_model', 'pm');
-            $this->methopm['index_get']['limit'] = 100;
         }
 
         // Get Data
         public function index_get() {
-            $id = $this->get('id');
+            $id = $this->get('id_produk');
             // jika id tidak ada (tidak panggil) 
             if($id === null) {
                 // maka panggil semua data
@@ -44,7 +43,7 @@
         // delete data
         public function index_delete() {
             // $id = (int) $this->get('id');
-            $id = $this->delete('id');
+            $id = $this->delete('id_produk');
             if($id === null) {
                 $this->response([
                     'status' => false,
@@ -55,7 +54,7 @@
                     // Ok
                     $this->response([
                         'status' => true,
-                        'id' => $id,
+                        'id_produk' => $id,
                         'message' => 'deleted success'
                     ], REST_Controller::HTTP_NO_CONTENT);
                 } else {
@@ -113,7 +112,7 @@
 
         // update data
         public function index_put() {
-            $id = $this->put('id');
+            $id = $this->put('id_produk');
             $nama_produk=  $this->put('nama_produk');
             $this->load->library('ciqrcode'); //pemanggilan library QR CODE
 

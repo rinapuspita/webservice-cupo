@@ -6,12 +6,12 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
             if($id === null) {
                 return $this->db->get('produk')->result_array(); 
             } else {
-                return $this->db->get_where('produk', ['id' => $id])->result_array();
+                return $this->db->get_where('produk', ['id_produk' => $id])->result_array();
             }
         }
 
         public function deleteProduk($id) {
-            $this->db->delete('produk', ['id' => $id]);
+            $this->db->delete('produk', ['id_produk' => $id]);
             return $this->db->affected_rows();
         }
 
@@ -21,7 +21,7 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
         } 
 
         public function updateProduk($data, $id) {
-            $this->db->update('produk', $data, ['id' => $id]);
+            $this->db->update('produk', $data, ['id_produk' => $id]);
             return $this->db->affected_rows();
         }
     }
