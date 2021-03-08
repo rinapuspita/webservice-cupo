@@ -70,6 +70,11 @@ $route['users/get'] = 'api/Users/fetch_all_users';
 $route['users/login'] = 'api/Users/login';
 $route['users/update']["put"] = 'api/Users/update_user';
 $route['customer/update']["put"] = 'api/Users/update_customer';
+//Peminjaman Routes
+$route['peminjaman/add'] = 'api/Peminjaman/add';
+$route['peminjaman/get'] = 'api/Peminjaman/getAll';
+$route['pengembalian/add']["put"] = 'api/Peminjaman/addPengembalian';
+
 
 //User Article Routes
 $route['article/add'] = 'api/Article/article_add';

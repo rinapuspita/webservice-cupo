@@ -24,5 +24,32 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
             $this->db->update('produk', $data, ['id_produk' => $id]);
             return $this->db->affected_rows();
         }
+
+        // Ubah Product Status ketika dipinjam
+        public function changeStatus($id)
+        {
+            $this->db->set('status', 0);
+            $this->db->where('id_produk', $id);
+            $this->db->update('produk');
+            return $this->db->affected_rows();
+        }
+
+        // Ubah Product Status ketika dikembalikan
+        public function changeKembali($id)
+        {
+            $this->db->set('status', 2);
+            $this->db->where('id_produk', $id);
+            $this->db->update('produk');
+            return $this->db->affected_rows();
+        }
+
+        // Ubah Product Status ketika sudah dicuci
+        public function changeStatusLagi($id)
+        {
+            $this->db->set('status', 1);
+            $this->db->where('id_produk', $id);
+            $this->db->update('produk');
+            return $this->db->affected_rows();
+        }
     }
 ?>
