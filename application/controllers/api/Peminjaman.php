@@ -11,6 +11,7 @@ class Peminjaman extends REST_Controller {
         parent::__construct();
         $this->load->model('Peminjaman_model', 'pem');
         $this->load->model('Produk_model', 'prm');
+        $this->load->model('Customer_model', 'cm');
     }
 
     // Get Data
@@ -43,7 +44,7 @@ class Peminjaman extends REST_Controller {
     {
         header("Access-Control-Allow-Origin: *");
         $_POST = $this->security->xss_clean($_POST);
-
+        $id = $this->input->post('id_user', TRUE);
         # form validation
         $this->form_validation->set_rules('id_produk', 'Kode Produk', 'required');
         if($this->form_validation->run() == FALSE){
@@ -55,24 +56,123 @@ class Peminjaman extends REST_Controller {
              );
              $this->response($message, REST_Controller::HTTP_NOT_FOUND);
         } else{
-
-            $data = [                
-                'id_user' => $this->input->post('id_user', TRUE),
-                'id_produk' => $this->input->post('id_produk', TRUE),
-            ];
-            if ($this->pem->add($data) > 0) {
-                $this->prm->changeStatus($data['id_produk']);
-                $this->response([
-                    'status' => true,
-                    'message' => 'Data peminjaman berhasil ditambahkan'
-                ], REST_Controller::HTTP_CREATED);
-            } else {
+            $output = $this->cm->getLimit($id);
+            if((!empty($output) AND $output!= FALSE)){
                 $this->response([
                     'status' => false,
-                    'message' => 'Data peminjaman gagal ditambahkan'
+                    'message' => 'Limit pinjam sudah habis'
                 ], REST_Controller::HTTP_NOT_FOUND);
+            } else{
+                $data = [                
+                    'id_user' => $this->input->post('id_user', TRUE),
+                    'id_produk' => $this->input->post('id_produk', TRUE),
+                    'id_mitra' => $this->input->post('id_mitra', TRUE),
+                ];
+                if ($this->pem->add($data) > 0) {
+                    $this->prm->changeStatus($data['id_produk']);
+                    $this->cm->changeStatus($data['id_user']);
+                    $this->response([
+                        'status' => true,
+                        'message' => 'Data peminjaman berhasil ditambahkan'
+                    ], REST_Controller::HTTP_CREATED);
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'message' => 'Data peminjaman gagal ditambahkan'
+                    ], REST_Controller::HTTP_NOT_FOUND);
+                }
             }
             // echo "Success";
+        }
+    }
+
+    public function getId_post()
+    {
+        $data = $this->input->post('nama_produk', TRUE);
+        $get = $this->prm->getId($data);
+        if($get>0){
+            $this->response([
+                'status' => true,
+                'data' => $get
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'Gagal memindai data'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function getDetail_post()
+    {
+        $id = $this->input->post('id_user', TRUE);
+        $produk = $this->input->post('id_produk', TRUE);
+        $get = $this->pem->getDetailpinjam($id, $produk);
+        if($get>0){
+            $this->response([
+                'status' => true,
+                'data' => $get
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'Gagal memindai data'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function getTglpinjam_post()
+    {
+        $id = $this->input->post('id_user', TRUE);
+        $produk = $this->input->post('id_produk', TRUE);
+        $pinjam = $this->input->post('id_pinjam', TRUE);
+        $get = $this->pem->getTgl($pinjam, $id, $produk);
+        $date = date("Y-m-d H:i:s", strtotime($get));
+        $tgl = date_create($date);
+        // echo $get;
+        $tanggal_now = date_create(date("Y-m-d H:i:s"));
+        // print $tanggal_now;
+        $terlambat = date_diff($tgl, $tanggal_now);
+        $hari = $terlambat->format("%a");
+        if($get == true){
+            $this->response([
+                'status' => true,
+                'data' => $get,
+                'message' => $hari
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'Gagal memindai data'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function change_post()
+    {
+        $data = [                
+            'id_user' => $this->input->post('id_user', TRUE),
+        ];
+        $this->cm->changeKembali($data['id_user']);
+        $this->response([
+            'status' => true,
+            'message' => 'Limit berhasil diubah'
+        ], REST_Controller::HTTP_NOT_FOUND);
+    }
+
+    public function limit_get()
+    {
+        $output = $this->cm->getLimit(2);
+        if((!empty($output) AND $output!= FALSE)){
+            $this->response([
+                'status' => false,
+                'message' => 'Return true'
+            ], REST_Controller::HTTP_OK);
+        } else{
+            $this->response([
+                'status' => true,
+                'message' => 'Limit pinjam sudah habis'
+            ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
 
@@ -123,4 +223,5 @@ class Peminjaman extends REST_Controller {
             }
         }
     }
+    
 }

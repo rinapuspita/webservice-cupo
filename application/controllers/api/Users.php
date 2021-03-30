@@ -47,61 +47,8 @@ class Users extends REST_Controller {
                 'email' => $this->input->post('email', TRUE),
                 'username' => $this->input->post('username', TRUE),
                 'password' => md5($this->input->post('password', TRUE)),
-                'avatar' => $this->_uploadImage('avatar'),
+                // 'avatar' => $this->input->post('avatar', TRUE),
                 'level' => 2,
-                // 'created_at' => time(),
-                // 'updated_at' => time(),
-            ];
-            if ($this->user_model->insert_user($data) > 0) {
-                $this->response([
-                    'status' => true,
-                    'message' => 'new User has been created succesfully'
-                ], REST_Controller::HTTP_CREATED);
-            } else {
-                $this->response([
-                    'status' => false,
-                    'message' => 'failed create data'
-                ], REST_Controller::HTTP_NOT_FOUND);
-            }
-            // echo "Success";
-        }
-    }
-
-    /**
-     * Add new user (cust)
-     * @method : POST
-     * @link: customer/register
-     */
-    public function add_cust_post()
-    {
-        header("Access-Control-Allow-Origin: *");
-        $_POST = $this->security->xss_clean($_POST);
-
-        # form validation
-        $this->form_validation->set_rules('fullname', 'Full Name', 'trim|required|max_length[50]');
-        $this->form_validation->set_rules('username', 'Username', 'trim|required|is_unique[user.username]|alpha_numeric',
-        array('is_unique' => 'This %s already exists please enter another username'));
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|max_length[60]|is_unique[user.email]',
-        array('is_unique' => 'This %s already exists please enter another email address'));
-        $this->form_validation->set_rules('password', 'Password', 'trim|required|max_length[25]');
-        // $this->form_validation->set_rules('passconf', 'Password Confirmation', 'required');
-        if($this->form_validation->run() == FALSE){
-            //form validation error
-            $message = array(
-                'status' => false,
-                'error' => $this->form_validation->error_array(),
-                'message' => validation_errors()
-             );
-             $this->response($message, REST_Controller::HTTP_NOT_FOUND);
-        } else{
-            
-            $data = [                
-                'fullname' => $this->input->post('fullname', TRUE),
-                'email' => $this->input->post('email', TRUE),
-                'username' => $this->input->post('username', TRUE),
-                'password' => md5($this->input->post('password', TRUE)),
-                'avatar' => $this->_uploadImage('avatar'),
-                'level' => 3,
                 // 'created_at' => time(),
                 // 'updated_at' => time(),
             ];
@@ -243,68 +190,6 @@ class Users extends REST_Controller {
         }
     }
 
-        /**
-     * Update customer data
-     * @method : PUT
-     * @link: users/update
-     */
-    public function update_customer_put()
-    {
-        $id = $this->put('id');
-        header("Access-Control-Allow-Origin: *");
-        $_POST = $this->security->xss_clean($_POST);
-        
-        $fullname = strip_tags($this->put('fullname'));
-        $username = strip_tags($this->put('username'));
-        $email = strip_tags($this->put('email'));
-        $password = strip_tags($this->put('password'));
-        // Validate the post data
-        if(!empty($id) && (!empty($fullname) || !empty($username) || !empty($email) || !empty($password))){
-        //update user's account data
-            $userData = array();
-            if(!empty($fullname)){
-                $userData['fullname'] = $fullname;
-            }
-            if(!empty($username)){
-                $userData['username'] = $username;
-            }
-            if(!empty($email)){
-                $userData['email'] = $email;
-            }
-            if(!empty($password)){
-                $userData['password'] = md5($password);
-            }
-            if (!empty($_FILES["image"]["name"])) {
-                $this->image = $this->_uploadImage();
-            } else{
-                $this->image = $userData["old_image"];
-            }
-            if(!empty($level)){
-                $userData['level'] = $level;
-            }
-            $update = $this->user_model->user_update($userData, $id);
-            //check if the user data is updated
-            if  ($update){
-                $this->response([
-                    'status' => true,
-                    'message' => 'User info has been updated succesfully'
-                ], REST_Controller::HTTP_OK);
-            } else{
-                $this->response([
-                    'status' => false,
-                    'message' => 'Some problems occurred, please try again.'
-                ], REST_Controller::HTTP_BAD_REQUEST);
-            }
-        } else{
-            // Set the response and exit
-            $this->response([
-                'status' => false,
-                'message' => 'Provide at least one user info to update.' 
-            ],REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-
     /**
      * User Login API
      * ---------------------
@@ -372,4 +257,31 @@ class Users extends REST_Controller {
             }
         }
      }
+
+     /**
+      * Hapus data user
+      */
+    public function index_delete()
+    {
+        $id = $this->delete('id');
+        if (empty($id)) {
+            $this->response([
+                'status' => false,
+                'data' => 'id null'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }else{
+            if ($this->user_model->user_delete($id) > 0) {
+                $this->response([
+                    'status' => true,
+                    'id' => $id,
+                    'message' => 'deleted'
+                ], REST_Controller::HTTP_OK);
+            }else{
+                $this->response([
+                    'status' => false,
+                    'data' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND);
+            }
+        }
+    }
 }

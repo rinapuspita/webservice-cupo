@@ -51,5 +51,11 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
             $this->db->update('produk');
             return $this->db->affected_rows();
         }
+
+        // Get data product when scan id
+        public function getId($id)
+        {
+            return $this->db->get_where('produk', ['nama_produk' => $id])->result_array();
+        }
     }
 ?>

@@ -65,16 +65,19 @@ $route['API'] = 'Rest_server';
 
 //User Routes API
 $route['users/register'] = 'api/Users/add_users';
-$route['customer/register'] = 'api/Users/add_cust';
+$route['users/update']["put"] = 'api/Users/update_user';
 $route['users/get'] = 'api/Users/fetch_all_users';
 $route['users/login'] = 'api/Users/login';
-$route['users/update']["put"] = 'api/Users/update_user';
-$route['customer/update']["put"] = 'api/Users/update_customer';
+//Customer routes
+$route['customer/register'] = 'api/Customer/add_cust';
+$route['customer/update']["put"] = 'api/Customer/update_customer';
 //Peminjaman Routes
 $route['peminjaman/add'] = 'api/Peminjaman/add';
 $route['peminjaman/get'] = 'api/Peminjaman/getAll';
-$route['pengembalian/add']["put"] = 'api/Peminjaman/addPengembalian';
 
+//pengembalian routes
+$route['pengembalian/add'] = 'api/Pengembalian/add';
+$route['pengembalian/get'] = 'api/Pengembalian/get';
 
 //User Article Routes
 $route['article/add'] = 'api/Article/article_add';

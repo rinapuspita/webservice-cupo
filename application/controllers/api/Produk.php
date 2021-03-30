@@ -93,6 +93,7 @@
             $data = [                
                 'nama_produk' => $nama_produk,
                 'qr_code' => $image_name,
+                'id_mitra' => 1,
                 'status' => 1
             ];
 
