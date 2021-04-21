@@ -41,6 +41,56 @@ class Pengembalian extends REST_Controller {
         }
     }
 
+    public function mKembali_get() {
+        $id = $this->get('id_mitra');
+        $mitra = $this->pm->getKembaliMitra($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function getDetail_post()
+    {
+        $id = $this->input->post('id_user', TRUE);
+        $produk = $this->input->post('id_produk', TRUE);
+        $get = $this->pm->getDetailKembali($id, $produk);
+        if($get>0){
+            $this->response([
+                'status' => true,
+                'data' => $get
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'Gagal memindai data'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function getRows_get()
+        {
+            $kembali = $this->pm->getCountKembali();
+            if($kembali){
+                $this->response([
+                    'status' => true,
+                    'data' => $kembali
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
     public function add_post()
     {
         header("Access-Control-Allow-Origin: *");
@@ -76,6 +126,20 @@ class Pengembalian extends REST_Controller {
                     'terlambat' => $hari,
                     'denda' => $denda
                 ];
+                if ($this->pm->add($data) > 0) {
+                    $this->prm->changeKembali($data['id_produk']);
+                    $this->cm->changeKembali($data['id_user']);
+                    $this->pem->changeStatus($data['id_pinjam']);
+                    $this->response([
+                        'status' => true,
+                        'message' => 'Data pengembalian berhasil'
+                    ], REST_Controller::HTTP_CREATED);
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'message' => 'Data pengembalian gagal ditambahkan'
+                    ], REST_Controller::HTTP_NOT_FOUND);
+                }
             } else{
                 $data = [                
                     'id_user' => $id,
@@ -85,21 +149,22 @@ class Pengembalian extends REST_Controller {
                     'terlambat' => 0,
                     'denda' => 0
                 ];
+                if ($this->pm->add($data) > 0) {
+                    $this->prm->changeKembali($data['id_produk']);
+                    $this->cm->changeKembali($data['id_user']);
+                    $this->pem->changeStatus($data['id_pinjam']);
+                    $this->response([
+                        'status' => true,
+                        'message' => 'Data pengembalian berhasil'
+                    ], REST_Controller::HTTP_CREATED);
+                } else {
+                    $this->response([
+                        'status' => false,
+                        'message' => 'Data pengembalian gagal ditambahkan'
+                    ], REST_Controller::HTTP_NOT_FOUND);
+                }
             }
             
-            if ($this->pm->add($data) > 0) {
-                $this->prm->changeKembali($data['id_produk']);
-                $this->cm->changeKembali($data['id_user']);
-                $this->response([
-                    'status' => true,
-                    'message' => 'Data pengembalian berhasil'
-                ], REST_Controller::HTTP_CREATED);
-            } else {
-                $this->response([
-                    'status' => false,
-                    'message' => 'Data pengembalian gagal ditambahkan'
-                ], REST_Controller::HTTP_NOT_FOUND);
-            }
         }
     }
 

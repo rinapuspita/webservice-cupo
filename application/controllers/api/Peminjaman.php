@@ -40,6 +40,38 @@ class Peminjaman extends REST_Controller {
         }
     }
 
+    public function mPinjam_get() {
+        $id = $this->get('id_mitra');
+        $mitra = $this->pem->getPinjamMitra($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function cPinjam_get() {
+        $id = $this->get('id_user');
+        $cust = $this->pem->getPinjamCust($id);
+        if($cust){
+            $this->response([
+                'status' => true,
+                'data' => $cust
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
     public function add_post()
     {
         header("Access-Control-Allow-Origin: *");
@@ -176,30 +208,6 @@ class Peminjaman extends REST_Controller {
         }
     }
 
-    public function addPengembalian_put()
-    {
-        $id = $this->put('id_pinjam');
-        $data = [
-            'id_user' => $this->put('id_user'),
-            'id_produk' => $this->put('id_produk'),
-            'status' => 'Sudah Kembali',
-            'tanggal_kembali' => date("Y-m-d H:i:s"),
-        ];
-
-        if ($this->pem->add_pengembalian($data, $id) > 0) {
-            $this->prm->changeKembali($data['id_produk']);
-            $this->response([
-                'success' => true,
-                'message' => 'Data pengembalian berhasil ditambahkan'
-            ], REST_Controller::HTTP_CREATED);
-        } else {
-            $this->response([
-                'success' => false,
-                'message' => 'Gagal menambahkan data pengembalian'
-            ], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
     public function index_delete()
     {
         $id = $this->delete('id_pinjam');
@@ -223,5 +231,21 @@ class Peminjaman extends REST_Controller {
             }
         }
     }
+
+    public function getRows_get()
+        {
+            $pinjam = $this->pem->getCountPinjam();
+            if($pinjam){
+                $this->response([
+                    'status' => true,
+                    'data' => $pinjam
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
     
 }

@@ -109,4 +109,9 @@ class Customer_model extends CI_model
     {
         return $this->db->get_where($this->userTbl, ['id_cust' => $id, 'limit_pinjam'=> 0])->result_array();
     }
+
+    public function getCount()
+    {
+        return $this->db->get('customer')->num_rows(); 
+    }
 }

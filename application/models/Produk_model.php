@@ -10,6 +10,16 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
             }
         }
 
+        public function getMitraprod($id) {
+            return $this->db->get_where('produk', ['id_mitra' => $id])->result_array();
+        }
+
+        public function getcupKotor() {
+            return $this->db->get_where('produk', [
+                'status' =>2
+                ])->result_array();
+        }
+
         public function deleteProduk($id) {
             $this->db->delete('produk', ['id_produk' => $id]);
             return $this->db->affected_rows();
@@ -52,10 +62,29 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
             return $this->db->affected_rows();
         }
 
+        // Ubah Product Lokasi 
+        public function changeLokasi($lokasi, $id)
+        {
+            $this->db->set('id_mitra', $lokasi);
+            $this->db->where('id_produk', $id);
+            $this->db->update('produk');
+            return $this->db->affected_rows();
+        }
+
         // Get data product when scan id
         public function getId($id)
         {
             return $this->db->get_where('produk', ['nama_produk' => $id])->result_array();
+        }
+
+        public function getNotif()
+        {
+            return $this->db->get_where('produk', ['id_mitra' => 2])->result_array();
+        }
+
+        public function getCountProduk()
+        {
+            return $this->db->get('produk')->num_rows(); 
         }
     }
 ?>

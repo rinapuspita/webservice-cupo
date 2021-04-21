@@ -12,18 +12,36 @@ class Peminjaman_model extends CI_model {
      */
     public function getPinjam($id = null) {
         if($id === null) {
-            $this->db->select('peminjaman.*, customer.fullname, produk.nama_produk, user.fullname');
+            $this->db->select('peminjaman.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname');
             $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
             $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
             $this->db->join('user', 'peminjaman.id_mitra = user.id');
             return $this->db->get('peminjaman')->result_array(); 
         } else {
-            $this->db->select('peminjaman.*, customer.fullname, produk.nama_produk, user.fullname');
+            $this->db->select('peminjaman.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname');
             $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
             $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
             $this->db->join('user', 'peminjaman.id_mitra = user.id');
             return $this->db->get_where('peminjaman', ['id_pinjam' => $id])->result_array();
         }
+    }
+
+    public function getPinjamMitra($id)
+    {
+        $this->db->select('peminjaman.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname as nama_mitra');
+        $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
+        $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
+        $this->db->join('user', 'peminjaman.id_mitra = user.id');
+        return $this->db->get_where('peminjaman', ['id_mitra' => $id])->result_array();
+    }
+
+    public function getPinjamCust($id)
+    {
+        $this->db->select('peminjaman.*, customer.fullname as nama_customer, produk.nama_produk, user.fullname as nama_mitra');
+        $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
+        $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
+        $this->db->join('user', 'peminjaman.id_mitra = user.id');
+        return $this->db->get_where('peminjaman', ['id_user' => $id])->result_array();
     }
 
     /**
@@ -65,16 +83,6 @@ class Peminjaman_model extends CI_model {
     }
 
     /**
-     * Tambah data pengembalian
-     */
-    public function add_pengembalian($data, $id) {
-        //update user data in users table
-        $this->db->where('id_pinjam', $id);
-        $this->db->update($this->pinjamTbl, $data);
-        return $this->db->affected_rows();
-    }
-
-    /**
      * Hapus data peminjaman
      */
     public function deletePeminjaman($id)
@@ -86,6 +94,20 @@ class Peminjaman_model extends CI_model {
     public function getDetailpinjam($id, $produk)
     {
         return $this->db->get_where($this->pinjamTbl, ['id_user' => $id,'id_produk' => $produk])->result_array();
+    }
+
+    // Ubah Peminjaman Status ketika dikembalikan
+    public function changeStatus($id)
+    {
+        $this->db->set('status', 'Sudah Kembali');
+        $this->db->where('id_pinjam', $id);
+        $this->db->update('peminjaman');
+        return $this->db->affected_rows();
+    }
+
+    public function getCountPinjam()
+    {
+        return $this->db->get('peminjaman')->num_rows(); 
     }
 
 

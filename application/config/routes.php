@@ -74,10 +74,13 @@ $route['customer/update']["put"] = 'api/Customer/update_customer';
 //Peminjaman Routes
 $route['peminjaman/add'] = 'api/Peminjaman/add';
 $route['peminjaman/get'] = 'api/Peminjaman/getAll';
+$route['peminjaman/getMitra'] = 'api/Peminjaman/mPinjam';
+$route['peminjaman/getCust'] = 'api/Peminjaman/cPinjam';
 
 //pengembalian routes
 $route['pengembalian/add'] = 'api/Pengembalian/add';
 $route['pengembalian/get'] = 'api/Pengembalian/get';
+$route['pengembalian/getMitra'] = 'api/Pengembalian/mKembali';
 
 //User Article Routes
 $route['article/add'] = 'api/Article/article_add';

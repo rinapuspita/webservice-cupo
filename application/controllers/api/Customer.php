@@ -4,7 +4,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . 'libraries/REST_Controller.php';
 require APPPATH . 'libraries/Format.php';
-use YoHang88\LetterAvatar\LetterAvatar;
 
 class Customer extends REST_Controller {
     public function __construct()
@@ -101,6 +100,37 @@ class Customer extends REST_Controller {
         }
     }
 
+    public function index_put()
+        {
+            $id = $this->put('id_cust');
+            $fullname = strip_tags($this->put('fullname'));
+            $username = strip_tags($this->put('username'));
+            $email = strip_tags($this->put('email'));
+            $password = strip_tags($this->put('password'));
+            $hp = strip_tags($this->put('no_hp'));
+            $data = [
+                'id_cust' => $id,
+                'fullname' => $fullname,
+                'username' => $username,
+                'email' => $email,
+                'password' => $password,
+                'no_hp' => $hp
+            ];
+
+            $update = $this->customer_model->user_update($data, $id);
+            if ($update) {
+                $this->response([
+                    'status' => true,
+                    'message' => 'data customer updated'  
+                ], REST_Controller::HTTP_CREATED);
+            } else {
+                $this->response([
+                    'status' => false,
+                    'message' => 'failed to update data'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        }
+
     /**
      * Update customer data
      * @method : PUT
@@ -108,16 +138,15 @@ class Customer extends REST_Controller {
      */
     public function update_customer_put()
     {
-        $id = $this->put('id_cust');
-        header("Access-Control-Allow-Origin: *");
-        $_POST = $this->security->xss_clean($_POST);
-        
+        $id_cust = $this->put('id_cust');
+        // var_dump($id_cust);
         $fullname = strip_tags($this->put('fullname'));
         $username = strip_tags($this->put('username'));
         $email = strip_tags($this->put('email'));
         $password = strip_tags($this->put('password'));
+        $hp = strip_tags($this->put('no_hp'));
         // Validate the post data
-        if(!empty($id) && (!empty($fullname) || !empty($username) || !empty($email) || !empty($password))){
+        if(!empty($id_cust) && (!empty($fullname) || !empty($username) || !empty($email) || !empty($password) || !empty($hp))){
         //update user's account data
             $userData = array();
             if(!empty($fullname)){
@@ -132,7 +161,10 @@ class Customer extends REST_Controller {
             if(!empty($password)){
                 $userData['password'] = md5($password);
             }
-            $update = $this->customer_model->user_update($userData, $id);
+            if(!empty($hp)){
+                $userData['no_hp'] = $hp;
+            }
+            $update = $this->customer_model->user_update($userData, $id_cust);
             //check if the user data is updated
             if  ($update){
                 $this->response([
@@ -193,6 +225,7 @@ class Customer extends REST_Controller {
                $token_data['fullname'] = $output->fullname;
                $token_data['username'] = $output->username;
                $token_data['email'] = $output->email;
+               $token_data['no_hp'] = $output->no_hp;
                $token_data['created_at'] = $output->created_at;
                $token_data['updated_at'] = $output->updated_at;
                $token_data['limit_pinjam'] = $output->limit_pinjam;
@@ -200,8 +233,8 @@ class Customer extends REST_Controller {
 
 
                $user_token = $this->authorization_token->generateToken($token_data);
-               print_r($this->Authorization_Token->generateToken($token_data));
-               exit;
+            //    print_r($this->Authorization_Token->generateToken($token_data));
+            //    exit;
                
                $return_data = [
                    'id_cust' => $output->id_cust,
@@ -224,11 +257,6 @@ class Customer extends REST_Controller {
                ], REST_Controller::HTTP_NOT_FOUND);
            }
        }
-    }
-
-    public function view()
-    {
-        
     }
     /**
      * Hapus data customer
@@ -254,6 +282,22 @@ class Customer extends REST_Controller {
                     'data' => 'id not found'
                 ], REST_Controller::HTTP_NOT_FOUND);
             }
+        }
+    }
+
+    public function getRows_get()
+    {
+        $customer = $this->customer_model->getCount();
+        if($customer){
+            $this->response([
+                'status' => true,
+                'data' => $customer
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
 

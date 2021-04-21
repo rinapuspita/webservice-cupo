@@ -35,6 +35,10 @@ class User_model extends CI_model {
         }
     }
 
+    public function getMitra() {
+        return $this->db->get_where($this->userTbl, ['level' => 2])->result_array();
+    }
+
     /**
      * User Login
      * ------------------

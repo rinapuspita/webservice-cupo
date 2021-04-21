@@ -40,6 +40,90 @@
 
         }
 
+        public function mProd_get() {
+            $id = $this->get('id_mitra');
+            $mitra = $this->pm->getMitraprod($id);
+            if($mitra){
+                $this->response([
+                    'status' => true,
+                    'data' => $mitra
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
+        public function cupKotor_get() {
+            $produk = $this->pm->getcupKotor();
+            if($produk){
+                $this->response([
+                    'status' => true,
+                    'data' => $produk
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
+        public function cleanProduct_get()
+        {
+            $id = $this->get('id_produk');
+            $lokasi = 1;
+            $produk = $this->pm->changeStatusLagi($id);
+            if($produk){
+                $this->pm->changeLokasi($lokasi, $id);
+                $this->response([
+                    'status' => true,
+                    'data' => 'Produk berhasil maintenance'
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
+        public function changeLokasi_put()
+        {
+            $id = $this->put('id_produk');
+            $lokasi = $this->put('id_mitra');
+            $produk = $this->pm->changeLokasi($lokasi, $id);
+            if($produk){
+                $this->response([
+                    'status' => true,
+                    'data' => 'Lokasi produk berhasil diupdate'
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
+        public function getRows_get()
+        {
+            $produk = $this->pm->getCountProduk();
+            if($produk){
+                $this->response([
+                    'status' => true,
+                    'data' => $produk
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
         // delete data
         public function index_delete() {
             // $id = (int) $this->get('id');
@@ -137,7 +221,8 @@
             $data = [
                 'nama_produk' => $nama_produk,
                 'qr_code' => $image_name,
-                'status' => $this->put('status')
+                'status' => $this->put('status'), 
+                'id_mitra' => $this->put('id_mitra')
             ];
 
             if ($this->pm->updateProduk($data, $id) > 0) {

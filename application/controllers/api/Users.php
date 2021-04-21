@@ -14,6 +14,22 @@ class Users extends REST_Controller {
         parent::__construct(); 
         $this->load->model('user_model');
     }
+
+    public function user_get() {
+        $mitra = $this->user_model->getMitra();
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
     /**
      * Add new user (mitra)
      * @method : POST
