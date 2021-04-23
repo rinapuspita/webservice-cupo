@@ -86,7 +86,7 @@ class Customer_model extends CI_model
     // Ubah Product Status ketika dipinjam
     public function changeStatus($id)
     {
-        $customer= $this->db->get('customer')->row();
+        $customer= $this->db->get_where($this->userTbl, ['id_cust' => $id])->row();
         $limit = $customer->limit_pinjam; 
         $this->db->set('limit_pinjam', $limit-1);
         $this->db->where('id_cust', $id);
@@ -97,7 +97,7 @@ class Customer_model extends CI_model
     // Ubah Product Status ketika dikembalikan
     public function changeKembali($id)
     {
-        $customer= $this->db->get('customer')->row();
+        $customer= $this->db->get_where($this->userTbl, ['id_cust' => $id])->row();
         $limit = $customer->limit_pinjam; 
         $this->db->set('limit_pinjam', $limit+1);
         $this->db->where('id_cust', $id);

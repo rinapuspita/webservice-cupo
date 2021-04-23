@@ -221,8 +221,8 @@
             $data = [
                 'nama_produk' => $nama_produk,
                 'qr_code' => $image_name,
-                'status' => $this->put('status'), 
-                'id_mitra' => $this->put('id_mitra')
+                // 'status' => $this->put('status'), 
+                // 'id_mitra' => $this->put('id_mitra')
             ];
 
             if ($this->pm->updateProduk($data, $id) > 0) {

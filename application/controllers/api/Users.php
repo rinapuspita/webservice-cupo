@@ -1,28 +1,32 @@
-<?php 
+<?php
+
 use Restserver\Libraries\REST_Controller;
-defined('BASEPATH') OR exit('No direct script access allowed');
+
+defined('BASEPATH') or exit('No direct script access allowed');
 
 require APPPATH . 'libraries/REST_Controller.php';
 require APPPATH . 'libraries/Format.php';
 
-class Users extends REST_Controller {
+class Users extends REST_Controller
+{
     public $id;
     public $image = "default.jpg";
 
     public function __construct()
     {
-        parent::__construct(); 
+        parent::__construct();
         $this->load->model('user_model');
     }
 
-    public function user_get() {
+    public function user_get()
+    {
         $mitra = $this->user_model->getMitra();
-        if($mitra){
+        if ($mitra) {
             $this->response([
                 'status' => true,
                 'data' => $mitra
             ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
-        } else{
+        } else {
             $this->response([
                 'status' => false,
                 'message' => 'id not found'
@@ -42,23 +46,31 @@ class Users extends REST_Controller {
 
         # form validation
         $this->form_validation->set_rules('fullname', 'Full Name', 'trim|required|max_length[50]');
-        $this->form_validation->set_rules('username', 'Username', 'trim|required|is_unique[user.username]|alpha_numeric',
-        array('is_unique' => 'This %s already exists please enter another username'));
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|max_length[60]|is_unique[user.email]',
-        array('is_unique' => 'This %s already exists please enter another email address'));
+        $this->form_validation->set_rules(
+            'username',
+            'Username',
+            'trim|required|is_unique[user.username]|alpha_numeric',
+            array('is_unique' => 'This %s already exists please enter another username')
+        );
+        $this->form_validation->set_rules(
+            'email',
+            'Email',
+            'trim|required|valid_email|max_length[60]|is_unique[user.email]',
+            array('is_unique' => 'This %s already exists please enter another email address')
+        );
         $this->form_validation->set_rules('password', 'Password', 'trim|required|max_length[25]');
         // $this->form_validation->set_rules('passconf', 'Password Confirmation', 'required');
-        if($this->form_validation->run() == FALSE){
+        if ($this->form_validation->run() == FALSE) {
             //form validation error
             $message = array(
                 'status' => false,
                 'error' => $this->form_validation->error_array(),
                 'message' => validation_errors()
-             );
-             $this->response($message, REST_Controller::HTTP_NOT_FOUND);
-        } else{
+            );
+            $this->response($message, REST_Controller::HTTP_NOT_FOUND);
+        } else {
 
-            $data = [                
+            $data = [
                 'fullname' => $this->input->post('fullname', TRUE),
                 'email' => $this->input->post('email', TRUE),
                 'username' => $this->input->post('username', TRUE),
@@ -85,28 +97,28 @@ class Users extends REST_Controller {
 
     private function _uploadImage()
     {
-    $config['upload_path']          = './assets/images/profile/';
-    $config['cacheable']	        = true; //boolean, the default is true
-    $config['cachedir']		        = './assets/'; //string, the default is application/cache/
-    $config['errorlog']		        = './assets/'; //string, the default is application/logs/
-    $config['allowed_types']        = 'gif|jpg|png|jpeg';
-    $config['quality']		        = true;
-    $config['file_name']            = md5(uniqid(rand(), true));
-    $config['overwrite']            = true;
-    $config['max_size']             = 1024; // 1MB
-    // $config['max_width']            = 1024;
-    // $config['max_height']           = 768;
+        $config['upload_path']          = './assets/images/profile/';
+        $config['cacheable']            = true; //boolean, the default is true
+        $config['cachedir']                = './assets/'; //string, the default is application/cache/
+        $config['errorlog']                = './assets/'; //string, the default is application/logs/
+        $config['allowed_types']        = 'gif|jpg|png|jpeg';
+        $config['quality']                = true;
+        $config['file_name']            = md5(uniqid(rand(), true));
+        $config['overwrite']            = true;
+        $config['max_size']             = 1024; // 1MB
+        // $config['max_width']            = 1024;
+        // $config['max_height']           = 768;
 
-    $this->load->library('upload', $config);
+        $this->load->library('upload', $config);
 
-    if ($this->upload->do_upload('avatar')) {
-        return $this->upload->data("file_name");
+        if ($this->upload->do_upload('avatar')) {
+            return $this->upload->data("file_name");
+        }
+        print_r($this->upload->display_errors());
+
+        return "default.jpg";
     }
-    print_r($this->upload->display_errors());
-    
-    return "default.jpg";
-    }
-    
+
     /**
      * fetch All user data
      * @method : GET
@@ -120,28 +132,59 @@ class Users extends REST_Controller {
         // $data = array('returned');
         // $this->response($data);
         $id = $this->get('id');
-            // jika id tidak ada (tidak panggil) 
-            if($id === null) {
-                // maka panggil semua data
-                $data = $this->user_model->fetch_all_users();
-                // tapi jika id di panggil maka hanya id tersebut yang akan muncul pada data tersebut
-            } else {
-                $data = $this->user_model->fetch_all_users($id);
+        // jika id tidak ada (tidak panggil) 
+        if ($id === null) {
+            // maka panggil semua data
+            $data = $this->user_model->fetch_all_users();
+            // tapi jika id di panggil maka hanya id tersebut yang akan muncul pada data tersebut
+        } else {
+            $data = $this->user_model->fetch_all_users($id);
+        }
 
-            }
+        if ($data) {
+            $this->response([
+                'status' => true,
+                'data' => $data
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
 
-            if($data) {
-                $this->response([
-                    'status' => true,
-                    'data' => $data
-                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
-            } else {
-                $this->response([
-                    'status' => false,
-                    'message' => 'id not found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            
-            }
+        }
+    }
+
+    public function index_put()
+    {
+        $id = $this->put('id');
+        $fullname = strip_tags($this->put('fullname'));
+        $username = strip_tags($this->put('username'));
+        $email = strip_tags($this->put('email'));
+        $password = strip_tags($this->put('password'));
+        $data = [
+            'id' => $id,
+            'fullname' => $fullname,
+            'username' => $username,
+            'email' => $email,
+            'password' => $password,
+            'updated_at' => date("Y-m-d H:i:s")
+        ];
+        // var_dump($id);
+        // die;
+
+        $update = $this->user_model->user_update($data, $id);
+        if ($update > 0) {
+            $this->response([
+                'status' => true,
+                'message' => 'data user updated'
+            ], REST_Controller::HTTP_CREATED);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'failed to update data'
+            ], REST_Controller::HTTP_BAD_REQUEST);
+        }
     }
 
     /**
@@ -152,57 +195,55 @@ class Users extends REST_Controller {
     public function update_user_put()
     {
         $id = $this->put('id');
-        header("Access-Control-Allow-Origin: *");
-        $_POST = $this->security->xss_clean($_POST);
-        
+        // header("Access-Control-Allow-Origin: *");
+        // $_POST = $this->security->xss_clean($_POST);
+
         $fullname = strip_tags($this->put('fullname'));
         $username = strip_tags($this->put('username'));
         $email = strip_tags($this->put('email'));
         $password = strip_tags($this->put('password'));
-        // $level = strip_tags($this->put('level'));
+        $this->response([
+            'status' => true,
+            'message' => $id . $fullname . $username . $email . $password
+        ], REST_Controller::HTTP_OK);
+        var_dump($id, $fullname, $username, $email, $password);
+        die;
         // Validate the post data
-        if(!empty($id) && (!empty($fullname) || !empty($username) || !empty($email) || !empty($password))){
-        //update user's account data
+        if (!empty($id) && (!empty($fullname) || !empty($username) || !empty($email) || !empty($password))) {
+            //update user's account data
             $userData = array();
-            if(!empty($fullname)){
+            if (!empty($fullname)) {
                 $userData['fullname'] = $fullname;
             }
-            if(!empty($username)){
+            if (!empty($username)) {
                 $userData['username'] = $username;
             }
-            if(!empty($email)){
+            if (!empty($email)) {
                 $userData['email'] = $email;
             }
-            if(!empty($password)){
+            if (!empty($password)) {
                 $userData['password'] = md5($password);
             }
-            // if (!empty($_FILES["image"]["name"])) {
-            //     $this->avatar = $this->_uploadImage();
-            // } else{
-            //     $this->avatar = $userData["old_image"];
-            // }
-            // if(!empty($level)){
-            //     $userData['level'] = $level;
-            // }
+            $userData['updated_at'] = date("Y-m-d H:i:s");
             $update = $this->user_model->user_update($userData, $id);
             //check if the user data is updated
-            if  ($update){
+            if ($update) {
                 $this->response([
                     'status' => true,
                     'message' => 'User info has been updated succesfully'
                 ], REST_Controller::HTTP_OK);
-            } else{
+            } else {
                 $this->response([
                     'status' => false,
                     'message' => 'Some problems occurred, please try again.'
                 ], REST_Controller::HTTP_BAD_REQUEST);
             }
-        } else{
+        } else {
             // Set the response and exit
             $this->response([
                 'status' => false,
-                'message' => 'Provide at least one user info to update.' 
-            ],REST_Controller::HTTP_BAD_REQUEST);
+                'message' => 'Provide at least one user info to update.'
+            ], REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 
@@ -215,28 +256,28 @@ class Users extends REST_Controller {
      * @link: users/login
      */
 
-     public function login_post()
-     {
+    public function login_post()
+    {
         header("Access-Control-Allow-Origin: *");
         $_POST = $this->security->xss_clean($_POST);
 
         # form validation
         $this->form_validation->set_rules('username', 'Username', 'trim|required');
         $this->form_validation->set_rules('password', 'Password', 'trim|required|max_length[25]');
-        if($this->form_validation->run() == FALSE){
+        if ($this->form_validation->run() == FALSE) {
             //form validation error
             $message = array(
                 'status' => false,
                 'error' => $this->form_validation->error_array(),
                 'message' => validation_errors()
-             );
-             $this->response($message, REST_Controller::HTTP_NOT_FOUND);
-        } else{
+            );
+            $this->response($message, REST_Controller::HTTP_NOT_FOUND);
+        } else {
             // Load login Function
             $username = $this->input->post('username');
             $pass = $this->input->post('password');
             $output = $this->user_model->user_login($username, $pass);
-            if (!empty($output) AND $output!= FALSE) {
+            if (!empty($output) and $output != FALSE) {
                 //Load Authorization Token Library
                 $this->load->library('Authorization_Token');
 
@@ -272,11 +313,11 @@ class Users extends REST_Controller {
                 ], REST_Controller::HTTP_NOT_FOUND);
             }
         }
-     }
+    }
 
-     /**
-      * Hapus data user
-      */
+    /**
+     * Hapus data user
+     */
     public function index_delete()
     {
         $id = $this->delete('id');
@@ -285,14 +326,14 @@ class Users extends REST_Controller {
                 'status' => false,
                 'data' => 'id null'
             ], REST_Controller::HTTP_NOT_FOUND);
-        }else{
+        } else {
             if ($this->user_model->user_delete($id) > 0) {
                 $this->response([
                     'status' => true,
                     'id' => $id,
                     'message' => 'deleted'
                 ], REST_Controller::HTTP_OK);
-            }else{
+            } else {
                 $this->response([
                     'status' => false,
                     'data' => 'id not found'

@@ -65,6 +65,12 @@ class Pengembalian_model extends CI_model {
         return $this->db->affected_rows();
     }
 
+    public function update($data, $id)
+    {
+        $this->db->update($this->kembaliTbl, $data, ['id_kembali' => $id]);
+        return $this->db->affected_rows();
+    }
+
     /**
      * Hapus data pengembalian
      */

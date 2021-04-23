@@ -89,17 +89,21 @@ class Peminjaman extends REST_Controller {
              $this->response($message, REST_Controller::HTTP_NOT_FOUND);
         } else{
             $output = $this->cm->getLimit($id);
+            
             if((!empty($output) AND $output!= FALSE)){
                 $this->response([
                     'status' => false,
                     'message' => 'Limit pinjam sudah habis'
                 ], REST_Controller::HTTP_NOT_FOUND);
-            } else{
+            } 
+            else{
                 $data = [                
                     'id_user' => $this->input->post('id_user', TRUE),
                     'id_produk' => $this->input->post('id_produk', TRUE),
                     'id_mitra' => $this->input->post('id_mitra', TRUE),
                 ];
+                $data = $this->cm->changeStatus($data['id_user']);
+                var_dump($data);die;
                 if ($this->pem->add($data) > 0) {
                     $this->prm->changeStatus($data['id_produk']);
                     $this->cm->changeStatus($data['id_user']);
@@ -205,6 +209,46 @@ class Peminjaman extends REST_Controller {
                 'status' => true,
                 'message' => 'Limit pinjam sudah habis'
             ], REST_Controller::HTTP_NOT_FOUND);
+        }
+    }
+
+    public function index_put()
+    {
+        $id = $this->put('id_pinjam');
+        // var_dump($id_cust);
+        // $id_user = strip_tags($this->put('id_user'));
+        // $id_produk = strip_tags($this->put('id_produk'));
+        // $id_mitra = strip_tags($this->put('id_mitra'));
+        $tanggal_pinjam = strip_tags($this->put('tanggal_pinjam'));
+        $tanggal_haruskembali = strip_tags($this->put('tanggal_haruskembali'));
+        // Validate the post data
+        if(!empty($id) || !empty($tanggal_pinjam) || !empty($tanggal_haruskembali)){
+        //update user's account data
+            $pinjamData = array();
+            if(!empty($tanggal_pinjam)){
+                $pinjamData['tanggal_pinjam'] = $tanggal_pinjam;
+            }
+            if(!empty($tanggal_haruskembali)){
+                $pinjamData['tanggal_haruskembali'] = $tanggal_haruskembali;
+            }
+            $update = $this->pem->update($pinjamData, $id);
+            if  ($update){
+                $this->response([
+                    'status' => true,
+                    'message' => 'updated succesfully'
+                ], REST_Controller::HTTP_OK);
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'Some problems occurred, please try again.'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        } else{
+            // Set the response and exit
+            $this->response([
+                'status' => false,
+                'message' => 'Provide at least one user info to update.' 
+            ],REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 

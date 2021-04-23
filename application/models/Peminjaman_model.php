@@ -91,6 +91,12 @@ class Peminjaman_model extends CI_model {
         return $this->db->affected_rows();
     }
 
+    public function update($data, $id)
+    {
+        $this->db->update($this->pinjamTbl, $data, ['id_pinjam' => $id]);
+        return $this->db->affected_rows();
+    }
+
     public function getDetailpinjam($id, $produk)
     {
         return $this->db->get_where($this->pinjamTbl, ['id_user' => $id,'id_produk' => $produk])->result_array();
@@ -100,6 +106,15 @@ class Peminjaman_model extends CI_model {
     public function changeStatus($id)
     {
         $this->db->set('status', 'Sudah Kembali');
+        $this->db->where('id_pinjam', $id);
+        $this->db->update('peminjaman');
+        return $this->db->affected_rows();
+    }
+
+    // Ubah Peminjaman Status ketika dikembalikan
+    public function changeStatusHapus($id)
+    {
+        $this->db->set('status', 'Belum Kembali');
         $this->db->where('id_pinjam', $id);
         $this->db->update('peminjaman');
         return $this->db->affected_rows();

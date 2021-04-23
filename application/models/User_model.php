@@ -67,9 +67,9 @@ class User_model extends CI_model {
      */
     public function user_update($data, $id) {
         // add modified date if not exists
-        if(!array_key_exists("updated_at", $data)){
-            $data['updated_at'] = date("Y-m-d H:i:s");
-        }
+        // if(!array_key_exists("updated_at", $data)){
+        //     $data['updated_at'] = date("Y-m-d H:i:s");
+        // }
         //update user data in users table
         $this->db->update($this->userTbl, $data, ['id' => $id]);
         return $this->db->affected_rows();

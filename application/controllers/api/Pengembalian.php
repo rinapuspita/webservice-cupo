@@ -126,6 +126,8 @@ class Pengembalian extends REST_Controller {
                     'terlambat' => $hari,
                     'denda' => $denda
                 ];
+                $data = $this->cm->changeKembali($data['id_user']);
+                var_dump($data); die;
                 if ($this->pm->add($data) > 0) {
                     $this->prm->changeKembali($data['id_produk']);
                     $this->cm->changeKembali($data['id_user']);
@@ -166,6 +168,94 @@ class Pengembalian extends REST_Controller {
             }
             
         }
+    }
+
+    public function index_put()
+    {
+        $id = $this->put('id_kembali');
+        // var_dump($id_cust);
+        // $id_user = strip_tags($this->put('id_user'));
+        // $id_produk = strip_tags($this->put('id_produk'));
+        // $id_mitra = strip_tags($this->put('id_mitra'));
+        $tanggal_kembali = strip_tags($this->put('tanggal_kembali'));
+        $status = strip_tags($this->put('status'));
+        // Validate the post data
+        if(!empty($id) || !empty($tanggal_kembali) || !empty($status)){
+        //update user's account data
+            $date = date("Y-m-d H:i:s", strtotime($tanggal_kembali));
+            $tgl = date_create($date);
+            $tanggal_now = date_create(date("Y-m-d H:i:s"));
+            $terlambat = date_diff($tgl, $tanggal_now);
+            // echo $terlambat->format('%d days');
+            $hari = $terlambat->format('%d');
+            // $hari = $terlambat->format("%a");
+            //menghitung denda
+            $denda = $hari*1000;
+
+            $kembaliData = array();
+            if(!empty($tanggal_kembali)){
+                $kembaliData['tanggal_kembali'] = $tanggal_kembali;
+            }
+            if(!empty($status)){
+                $kembaliData['status'] = $status;
+            }
+            $kembaliData['terlambat'] = $terlambat;
+            $kembaliData['denda'] = $denda;
+            
+            $update = $this->pm->update($kembaliData, $id);
+            if  ($update){
+                $this->response([
+                    'status' => true,
+                    'message' => 'updated succesfully'
+                ], REST_Controller::HTTP_OK);
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'Some problems occurred, please try again.'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        } else{
+            // Set the response and exit
+            $this->response([
+                'status' => false,
+                'message' => 'Provide at least one user info to update.' 
+            ],REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function index_delete()
+    {
+        $id = $this->delete('id_kembali');
+        if (empty($id)) {
+            $this->response([
+                'status' => false,
+                'data' => 'id null'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }else{
+            if ($this->pm->delete($id) > 0) {
+                $this->response([
+                    'status' => true,
+                    'id' => $id,
+                    'message' => 'deleted'
+                ], REST_Controller::HTTP_OK);
+            }else{
+                $this->response([
+                    'status' => false,
+                    'data' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND);
+            }
+        }
+    }
+
+    public function updateData_put()
+    {
+        $id_kembali = $this->put('id_kembali');
+        $data['kembali'] = $this->pm->getKembali($id_kembali);
+        $kembaliData = array();
+        // $this->pem->changeStatusHapus($data['kembali']);
+        // $this->prm->changeStatus($data['kembali']['id_produk']);
+        // $this->cm->changeStatus($data['kembali']['id_user']);
+        var_dump($data['kembali']); die;
     }
 
 }

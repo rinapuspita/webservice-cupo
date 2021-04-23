@@ -106,14 +106,14 @@ class Customer extends REST_Controller {
             $fullname = strip_tags($this->put('fullname'));
             $username = strip_tags($this->put('username'));
             $email = strip_tags($this->put('email'));
-            $password = strip_tags($this->put('password'));
+            // $password = strip_tags($this->put('password'));
             $hp = strip_tags($this->put('no_hp'));
             $data = [
                 'id_cust' => $id,
                 'fullname' => $fullname,
                 'username' => $username,
                 'email' => $email,
-                'password' => $password,
+                // 'password' => $password,
                 'no_hp' => $hp
             ];
 
