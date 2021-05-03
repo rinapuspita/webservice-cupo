@@ -17,10 +17,10 @@ class Customer_model extends CI_model
     {
         //add created and modified date if not exists
         if (!array_key_exists("created_at", $data)) {
-            $data['created_at'] = date("Y-m-d H:i:s");
+            $data['created_at'] = date("Y-m-d");
         }
         if (!array_key_exists("updated_at", $data)) {
-            $data['updated_at'] = date("Y-m-d H:i:s");
+            $data['updated_at'] = date("Y-m-d");
         }
 
         //insert user data to users table
@@ -31,10 +31,26 @@ class Customer_model extends CI_model
     public function fetch_all_users($id = null)
     {
         if ($id === null) {
-            return $this->db->get($this->userTbl)->result_array();
+            return $this->db->get_where($this->userTbl, ['is_active' => 1])->result_array();
         } else {
             return $this->db->get_where($this->userTbl, ['id_cust' => $id])->result_array();
         }
+    }
+
+    public function getCust() {
+        return $this->db->get_where($this->userTbl, ['is_active' => 1])->result_array();
+    }
+
+    public function getCustAktivasi() {
+        return $this->db->get_where($this->userTbl, ['is_active' => null])->result_array();
+    }
+
+    public function getCustByUsername($username)
+    {
+        $this->db->where('email', $username);
+        $this->db->or_where('username', $username);
+        $q = $this->db->get($this->userTbl);
+        return $q->result_array();
     }
 
     /**
@@ -67,7 +83,7 @@ class Customer_model extends CI_model
     {
         // add modified date if not exists
         if (!array_key_exists("updated_at", $data)) {
-            $data['updated_at'] = date("Y-m-d H:i:s");
+            $data['updated_at'] = date("Y-m-d");
         }
         //update user data in users table
         $this->db->update($this->userTbl, $data, ['id_cust' => $id]);
@@ -113,5 +129,13 @@ class Customer_model extends CI_model
     public function getCount()
     {
         return $this->db->get('customer')->num_rows(); 
+    }
+
+    public function aktivasiAcc($id)
+    {
+        $this->db->set('is_active', 1);
+        $this->db->where('id_cust', $id);
+        $this->db->update($this->userTbl);
+        return $this->db->affected_rows();
     }
 }

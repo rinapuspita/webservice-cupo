@@ -56,6 +56,55 @@ class Peminjaman extends REST_Controller {
         }
     }
 
+    public function mPinjamAcc_get() {
+        $id = $this->get('id_mitra');
+        $mitra = $this->pem->getPinjamAktivasi($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function changeActive_get()
+    {
+        $id = $this->get('id_pinjam');
+        $pinjam = $this->pem->aktivasiAcc($id);
+        if($pinjam){
+            $this->response([
+                'status' => true,
+                'data' => 'Transaction activation successfully'
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'failed update activation'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function mPinjamToday_get() {
+        $id = $this->get('id_mitra');
+        $mitra = $this->pem->getPinjamMitraHariini($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
     public function cPinjam_get() {
         $id = $this->get('id_user');
         $cust = $this->pem->getPinjamCust($id);
@@ -163,10 +212,10 @@ class Peminjaman extends REST_Controller {
         $produk = $this->input->post('id_produk', TRUE);
         $pinjam = $this->input->post('id_pinjam', TRUE);
         $get = $this->pem->getTgl($pinjam, $id, $produk);
-        $date = date("Y-m-d H:i:s", strtotime($get));
+        $date = date("Y-m-d", strtotime($get));
         $tgl = date_create($date);
         // echo $get;
-        $tanggal_now = date_create(date("Y-m-d H:i:s"));
+        $tanggal_now = date_create(date("Y-m-d"));
         // print $tanggal_now;
         $terlambat = date_diff($tgl, $tanggal_now);
         $hari = $terlambat->format("%a");

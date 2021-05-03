@@ -32,7 +32,33 @@ class Peminjaman_model extends CI_model {
         $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
         $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
         $this->db->join('user', 'peminjaman.id_mitra = user.id');
-        return $this->db->get_where('peminjaman', ['id_mitra' => $id])->result_array();
+        return $this->db->get_where('peminjaman', ['id_mitra' => $id, 'is_acc' => 1])->result_array();
+    }
+
+    public function getPinjamAktivasi($id) {
+        $this->db->select('peminjaman.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname');
+        $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
+        $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
+        $this->db->join('user', 'peminjaman.id_mitra = user.id');
+        return $this->db->get_where('peminjaman', ['id_mitra' => $id, 'is_acc' => null])->result_array();
+    }
+
+    public function aktivasiAcc($id)
+    {
+        $this->db->set('is_acc', 1);
+        $this->db->where('id_pinjam', $id);
+        $this->db->update('peminjaman');
+        return $this->db->affected_rows();
+    }
+
+    public function getPinjamMitraHariini($id)
+    {
+        $tanggal = date("Y-m-d");
+        $this->db->select('peminjaman.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname as nama_mitra');
+        $this->db->join('customer', 'peminjaman.id_user = customer.id_cust');
+        $this->db->join('produk', 'peminjaman.id_produk = produk.id_produk');
+        $this->db->join('user', 'peminjaman.id_mitra = user.id');
+        return $this->db->get_where('peminjaman', ['peminjaman.id_mitra' => $id, 'tanggal_pinjam' => $tanggal])->result_array();
     }
 
     public function getPinjamCust($id)
@@ -51,9 +77,9 @@ class Peminjaman_model extends CI_model {
     {
         //add created and modified date if not exists
         if(!array_key_exists("tanggal_pinjam", $data)){
-            $data['tanggal_pinjam'] = date("Y-m-d H:i:s");
+            $data['tanggal_pinjam'] = date("Y-m-d");
         }
-        $data['tanggal_haruskembali'] = date('Y-m-d H:i:s',strtotime("+7 days"));
+        $data['tanggal_haruskembali'] = date('Y-m-d',strtotime("+7 days"));
         // $data['tanggal_haruskembali'] = date('Y-m-d H:i:s');
         
         //insert user data to users table
@@ -75,7 +101,7 @@ class Peminjaman_model extends CI_model {
             'id_produk' => $id_produk,
         ])->row();
         $tanggal = $query->tanggal_haruskembali; 
-        if(date("Y-m-d H:i:s") > $tanggal){
+        if(date("Y-m-d") > $tanggal){
             return $tanggal;
         } else{
             return false;

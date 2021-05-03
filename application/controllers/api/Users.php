@@ -9,9 +9,6 @@ require APPPATH . 'libraries/Format.php';
 
 class Users extends REST_Controller
 {
-    public $id;
-    public $image = "default.jpg";
-
     public function __construct()
     {
         parent::__construct();
@@ -33,6 +30,41 @@ class Users extends REST_Controller
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
+
+    public function userActive_get()
+    {
+        $mitra = $this->user_model->getMitraAktivasi();
+        if ($mitra) {
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function changeActive_get()
+    {
+        $id = $this->get('id');
+        $mitra = $this->user_model->changeStatus($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => 'User activation successfully'
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'failed update user activation'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+
 
     /**
      * Add new user (mitra)
@@ -94,31 +126,6 @@ class Users extends REST_Controller
             // echo "Success";
         }
     }
-
-    private function _uploadImage()
-    {
-        $config['upload_path']          = './assets/images/profile/';
-        $config['cacheable']            = true; //boolean, the default is true
-        $config['cachedir']                = './assets/'; //string, the default is application/cache/
-        $config['errorlog']                = './assets/'; //string, the default is application/logs/
-        $config['allowed_types']        = 'gif|jpg|png|jpeg';
-        $config['quality']                = true;
-        $config['file_name']            = md5(uniqid(rand(), true));
-        $config['overwrite']            = true;
-        $config['max_size']             = 1024; // 1MB
-        // $config['max_width']            = 1024;
-        // $config['max_height']           = 768;
-
-        $this->load->library('upload', $config);
-
-        if ($this->upload->do_upload('avatar')) {
-            return $this->upload->data("file_name");
-        }
-        print_r($this->upload->display_errors());
-
-        return "default.jpg";
-    }
-
     /**
      * fetch All user data
      * @method : GET
@@ -152,38 +159,6 @@ class Users extends REST_Controller
                 'message' => 'id not found'
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
 
-        }
-    }
-
-    public function index_put()
-    {
-        $id = $this->put('id');
-        $fullname = strip_tags($this->put('fullname'));
-        $username = strip_tags($this->put('username'));
-        $email = strip_tags($this->put('email'));
-        $password = strip_tags($this->put('password'));
-        $data = [
-            'id' => $id,
-            'fullname' => $fullname,
-            'username' => $username,
-            'email' => $email,
-            'password' => $password,
-            'updated_at' => date("Y-m-d H:i:s")
-        ];
-        // var_dump($id);
-        // die;
-
-        $update = $this->user_model->user_update($data, $id);
-        if ($update > 0) {
-            $this->response([
-                'status' => true,
-                'message' => 'data user updated'
-            ], REST_Controller::HTTP_CREATED);
-        } else {
-            $this->response([
-                'status' => false,
-                'message' => 'failed to update data'
-            ], REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 

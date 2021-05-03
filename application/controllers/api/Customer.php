@@ -285,6 +285,35 @@ class Customer extends REST_Controller {
         }
     }
 
+    public function getCustomer_post()
+    {
+        #form_validation
+        $this->form_validation->set_rules('username', 'Username', 'trim|required');
+        if($this->form_validation->run() == FALSE){
+            //form validation error
+            $message = array(
+                'status' => false,
+                'error' => $this->form_validation->error_array(),
+                'message' => validation_errors()
+                );
+                $this->response($message, REST_Controller::HTTP_NOT_FOUND);
+        } else{
+            $username = $this->input->post('username');
+            $output = $this->customer_model->getCustByUsername($username);
+            if($output){
+                $this->response([
+                    'status' => true,
+                    'data' => $output
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'username not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+    }
+
     public function getRows_get()
     {
         $customer = $this->customer_model->getCount();
@@ -297,6 +326,39 @@ class Customer extends REST_Controller {
             $this->response([
                 'status' => false,
                 'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function custActive_get()
+    {
+        $customer = $this->customer_model->getCustAktivasi();
+        if ($customer) {
+            $this->response([
+                'status' => true,
+                'data' => $customer
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function changeActive_get()
+    {
+        $id = $this->get('id_cust');
+        $customer = $this->customer_model->aktivasiAcc($id);
+        if($customer){
+            $this->response([
+                'status' => true,
+                'data' => 'User activation successfully'
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'failed update user activation'
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }

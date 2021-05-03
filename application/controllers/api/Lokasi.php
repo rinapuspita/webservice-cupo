@@ -141,4 +141,51 @@ class Lokasi extends REST_Controller {
         }
     }
 
+    public function edit_put()
+    {
+        $id = $this->put('id_lokasi');
+        // var_dump($id_cust);
+        // $id_user = strip_tags($this->put('id_user'));
+        // $id_produk = strip_tags($this->put('id_produk'));
+        $id_mitra = strip_tags($this->put('id_mitra'));
+        $alamat = strip_tags($this->put('alamat'));
+        $latitude = strip_tags($this->put('latitude'));
+        $longitude = strip_tags($this->put('longitude'));
+        // Validate the post data
+        if(!empty($id) || !empty($id_mitra) || !empty($alamat) || !empty($longitude) || !empty($longitude)){
+        //update user's account data
+            $lokasiData = array();
+            if(!empty($id_mitra)){
+                $lokasiData['id_mitra'] = $id_mitra;
+            }
+            if(!empty($alamat)){
+                $lokasiData['alamat'] = $alamat;
+            }
+            if(!empty($latitude)){
+                $lokasiData['latitude'] = $latitude;
+            }
+            if(!empty($longitude)){
+                $lokasiData['longitude'] =$longitude;
+            $update = $this->lk->update($id, $lokasiData);
+            if  ($update){
+                $this->response([
+                    'status' => true,
+                    'message' => 'updated succesfully'
+                ], REST_Controller::HTTP_OK);
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'Some problems occurred, please try again.'
+                ], REST_Controller::HTTP_BAD_REQUEST);
+            }
+        } else{
+            // Set the response and exit
+            $this->response([
+                'status' => false,
+                'message' => 'Provide at least one user info to update.' 
+            ],REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+    }
+
 }

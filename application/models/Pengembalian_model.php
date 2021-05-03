@@ -35,7 +35,24 @@ class Pengembalian_model extends CI_model {
         $this->db->join('produk', 'pengembalian.id_produk = produk.id_produk');
         $this->db->join('user', 'pengembalian.id_mitra = user.id');
         $this->db->join('peminjaman', 'pengembalian.id_pinjam = peminjaman.id_pinjam');
-        return $this->db->get_where('pengembalian', ['id_mitra' => $id])->result_array();
+        return $this->db->get_where('pengembalian', ['id_mitra' => $id, 'is_acc' => 1])->result_array();
+    }
+
+    public function getKembaliAktivasi() {
+        $this->db->select('pengembalian.*, customer.fullname as nama_peminjam, produk.nama_produk, user.fullname, peminjaman.id_pinjam as nama_mitra');
+        $this->db->join('customer', 'pengembalian.id_user = customer.id_cust');
+        $this->db->join('produk', 'pengembalian.id_produk = produk.id_produk');
+        $this->db->join('user', 'pengembalian.id_mitra = user.id');
+        $this->db->join('peminjaman', 'pengembalian.id_pinjam = peminjaman.id_pinjam');
+        return $this->db->get_where('peminjaman', ['is_acc' => null])->result_array();
+    }
+
+    public function aktivasiAcc($id)
+    {
+        $this->db->set('is_acc', 1);
+        $this->db->where('id_kembali', $id);
+        $this->db->update('pngembalian');
+        return $this->db->affected_rows();
     }
 
     public function getKembaliCust($id)
@@ -58,7 +75,7 @@ class Pengembalian_model extends CI_model {
      */
     public function add($data)
     {
-        $data['tanggal_kembali'] = date("Y-m-d H:i:s");
+        $data['tanggal_kembali'] = date("Y-m-d");
         
         //insert user data to users table
         $this->db->insert($this->kembaliTbl, $data);
