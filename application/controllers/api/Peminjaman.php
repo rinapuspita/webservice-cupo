@@ -75,8 +75,12 @@ class Peminjaman extends REST_Controller {
     public function changeActive_get()
     {
         $id = $this->get('id_pinjam');
+        $data = $this->pem->getPinjam($id);
+        // var_dump($data[0]['id_produk']); die;
         $pinjam = $this->pem->aktivasiAcc($id);
         if($pinjam){
+            $this->prm->changeStatus($data[0]['id_produk']);
+            $this->cm->changeStatus($data[0]['id_user']);
             $this->response([
                 'status' => true,
                 'data' => 'Transaction activation successfully'
@@ -151,11 +155,11 @@ class Peminjaman extends REST_Controller {
                     'id_produk' => $this->input->post('id_produk', TRUE),
                     'id_mitra' => $this->input->post('id_mitra', TRUE),
                 ];
-                $data = $this->cm->changeStatus($data['id_user']);
-                var_dump($data);die;
+                // $data = $this->cm->changeStatus($data['id_user']);
+                // var_dump($data);die;
                 if ($this->pem->add($data) > 0) {
-                    $this->prm->changeStatus($data['id_produk']);
-                    $this->cm->changeStatus($data['id_user']);
+                    // $this->prm->changeStatus($data['id_produk']);
+                    // $this->cm->changeStatus($data['id_user']);
                     $this->response([
                         'status' => true,
                         'message' => 'Data peminjaman berhasil ditambahkan'

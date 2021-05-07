@@ -44,14 +44,14 @@ class Pengembalian_model extends CI_model {
         $this->db->join('produk', 'pengembalian.id_produk = produk.id_produk');
         $this->db->join('user', 'pengembalian.id_mitra = user.id');
         $this->db->join('peminjaman', 'pengembalian.id_pinjam = peminjaman.id_pinjam');
-        return $this->db->get_where('peminjaman', ['is_acc' => null])->result_array();
+        return $this->db->get_where('pengembalian', ['is_acc' => null])->result_array();
     }
 
     public function aktivasiAcc($id)
     {
         $this->db->set('is_acc', 1);
         $this->db->where('id_kembali', $id);
-        $this->db->update('pngembalian');
+        $this->db->update('pengembalian');
         return $this->db->affected_rows();
     }
 

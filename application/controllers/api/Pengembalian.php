@@ -57,6 +57,44 @@ class Pengembalian extends REST_Controller {
         }
     }
 
+    public function mKembaliAcc_get() {
+        $id = $this->get('id_mitra');
+        $mitra = $this->pm->getKembaliAktivasi($id);
+        if($mitra){
+            $this->response([
+                'status' => true,
+                'data' => $mitra
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
+    public function changeActive_get()
+    {
+        $id = $this->get('id_kembali');
+        $data = $this->pm->getKembali($id);
+        // var_dump($data[0]['id_produk']); die;
+        $kembali = $this->pm->aktivasiAcc($id);
+        if($kembali){
+            $this->prm->changeKembali($data[0]['id_produk']);
+            $this->cm->changeKembali($data[0]['id_user']);
+            $this->pem->changeStatus($data[0]['id_pinjam']);
+            $this->response([
+                'status' => true,
+                'data' => 'Transaction activation successfully'
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'failed update activation'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
     public function getDetail_post()
     {
         $id = $this->input->post('id_user', TRUE);
@@ -126,12 +164,12 @@ class Pengembalian extends REST_Controller {
                     'terlambat' => $hari,
                     'denda' => $denda
                 ];
-                $data = $this->cm->changeKembali($data['id_user']);
-                var_dump($data); die;
+                // $data = $this->cm->changeKembali($data['id_user']);
+                // var_dump($data); die;
                 if ($this->pm->add($data) > 0) {
-                    $this->prm->changeKembali($data['id_produk']);
-                    $this->cm->changeKembali($data['id_user']);
-                    $this->pem->changeStatus($data['id_pinjam']);
+                    // $this->prm->changeKembali($data['id_produk']);
+                    // $this->cm->changeKembali($data['id_user']);
+                    // $this->pem->changeStatus($data['id_pinjam']);
                     $this->response([
                         'status' => true,
                         'message' => 'Data pengembalian berhasil'
@@ -152,9 +190,9 @@ class Pengembalian extends REST_Controller {
                     'denda' => 0
                 ];
                 if ($this->pm->add($data) > 0) {
-                    $this->prm->changeKembali($data['id_produk']);
-                    $this->cm->changeKembali($data['id_user']);
-                    $this->pem->changeStatus($data['id_pinjam']);
+                    // $this->prm->changeKembali($data['id_produk']);
+                    // $this->cm->changeKembali($data['id_user']);
+                    // $this->pem->changeStatus($data['id_pinjam']);
                     $this->response([
                         'status' => true,
                         'message' => 'Data pengembalian berhasil'
