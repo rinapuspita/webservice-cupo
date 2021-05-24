@@ -330,19 +330,36 @@ class Peminjaman extends REST_Controller {
     }
 
     public function getRows_get()
-        {
-            $pinjam = $this->pem->getCountPinjam();
-            if($pinjam){
-                $this->response([
-                    'status' => true,
-                    'data' => $pinjam
-                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
-            } else{
-                $this->response([
-                    'status' => false,
-                    'message' => 'id not found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            }
+    {
+        $pinjam = $this->pem->getCountPinjam();
+        if($pinjam){
+            $this->response([
+                'status' => true,
+                'data' => $pinjam
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
+    }
+
+    public function getRowsMitra_get()
+    {
+        $id = $this->get('id_mitra');
+        $pinjam = $this->pem->getCount($id);
+        if($pinjam){
+            $this->response([
+                'status' => true,
+                'data' => $pinjam
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
     
 }

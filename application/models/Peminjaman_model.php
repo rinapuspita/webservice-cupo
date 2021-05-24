@@ -131,7 +131,7 @@ class Peminjaman_model extends CI_model {
     // Ubah Peminjaman Status ketika dikembalikan
     public function changeStatus($id)
     {
-        $this->db->set('status', 'Sudah Kembali');
+        $this->db->set('status', 'Already Restored');
         $this->db->where('id_pinjam', $id);
         $this->db->update('peminjaman');
         return $this->db->affected_rows();
@@ -140,7 +140,7 @@ class Peminjaman_model extends CI_model {
     // Ubah Peminjaman Status ketika dikembalikan
     public function changeStatusHapus($id)
     {
-        $this->db->set('status', 'Belum Kembali');
+        $this->db->set('status', 'Being Borrowed');
         $this->db->where('id_pinjam', $id);
         $this->db->update('peminjaman');
         return $this->db->affected_rows();
@@ -149,6 +149,11 @@ class Peminjaman_model extends CI_model {
     public function getCountPinjam()
     {
         return $this->db->get('peminjaman')->num_rows(); 
+    }
+
+    public function getCount($id)
+    {
+        return $this->db->get_where('peminjaman', ['id_mitra' => $id])->num_rows(); 
     }
 
 

@@ -118,29 +118,23 @@ class Lokasi extends REST_Controller {
         }
     }
 
-    //Update data lokasi
-    public function index_put()
+    public function getRows_get()
     {
-        $id = $this->put('id_lokasi');
-        $data = [
-            'id_mitra' => $this->put('id_mitra'),
-            'alamat' => $this->put('alamat'),
-            'latitude' => $this->put('latitude'),
-            'longitude' => $this->put('longitude')
-        ];
-        if ($this->lk->update($id, $data) > 0) {
+        $lokasi = $this->lk->getCount();
+        if($lokasi){
             $this->response([
-                'success' => true,
-                'message' => 'Data lokasi updated'  
-            ], REST_Controller::HTTP_CREATED);
-        } else {
+                'status' => true,
+                'data' => $lokasi
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
             $this->response([
-                'success' => false,
-                'message' => 'failed to update data'
-            ], REST_Controller::HTTP_BAD_REQUEST);
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
 
+    //Update data lokasi
     public function edit_put()
     {
         $id = $this->put('id_lokasi');

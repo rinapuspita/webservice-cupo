@@ -102,5 +102,10 @@ class Pengembalian_model extends CI_model {
         return $this->db->get('pengembalian')->num_rows(); 
     }
 
+    public function getCount($id)
+    {
+        return $this->db->get_where('pengembalian', ['id_mitra' => $id])->num_rows(); 
+    }
+
 
 }

@@ -114,20 +114,37 @@ class Pengembalian extends REST_Controller {
     }
 
     public function getRows_get()
-        {
-            $kembali = $this->pm->getCountKembali();
-            if($kembali){
-                $this->response([
-                    'status' => true,
-                    'data' => $kembali
-                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
-            } else{
-                $this->response([
-                    'status' => false,
-                    'message' => 'id not found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            }
+    {
+        $kembali = $this->pm->getCountKembali();
+        if($kembali){
+            $this->response([
+                'status' => true,
+                'data' => $kembali
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
+    }
+
+    public function getRowsMitra_get()
+    {
+        $id = $this->get('id_mitra');
+        $kembali = $this->pm->getCount($id);
+        if($kembali){
+            $this->response([
+                'status' => true,
+                'data' => $kembali
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
 
     public function add_post()
     {

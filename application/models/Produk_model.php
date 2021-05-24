@@ -90,5 +90,10 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
         {
             return $this->db->get('produk')->num_rows(); 
         }
+
+        public function getCount($id)
+        {
+            return $this->db->get_where('produk', ['id_mitra' => $id])->num_rows(); 
+        }
     }
 ?>

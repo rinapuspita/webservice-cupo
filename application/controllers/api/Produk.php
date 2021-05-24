@@ -124,6 +124,23 @@
             }
         }
 
+    public function getRowsMitra_get()
+    {
+        $id = $this->get('id_mitra');
+        $produk = $this->pm->getCount($id);
+        if($produk){
+            $this->response([
+                'status' => true,
+                'data' => $produk
+            ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+        } else{
+            $this->response([
+                'status' => false,
+                'message' => 'id not found'
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
+
         // delete data
         public function index_delete() {
             // $id = (int) $this->get('id');

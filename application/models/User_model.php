@@ -95,5 +95,10 @@ class User_model extends CI_model {
         $this->db->update($this->userTbl);
         return $this->db->affected_rows();
     }
+
+    public function getCount()
+    {
+        return $this->db->get_where($this->userTbl, ['level' => 2])->num_rows(); 
+    }
       
 }

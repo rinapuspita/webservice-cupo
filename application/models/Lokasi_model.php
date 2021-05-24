@@ -56,4 +56,9 @@ class Lokasi_model extends CI_model {
         return $this->db->affected_rows();
     }
 
+    public function getCount()
+    {
+        return $this->db->get('lokasi')->num_rows(); 
+    }
+
 }
