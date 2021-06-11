@@ -56,6 +56,22 @@
             }
         }
 
+        public function mStok_get() {
+            $id = $this->get('id_mitra');
+            $mitra = $this->pm->getMitraStok($id);
+            if($mitra){
+                $this->response([
+                    'status' => true,
+                    'data' => $mitra
+                ], REST_Controller::HTTP_OK); // NOT_FOUND (404) being the HTTP response code
+            } else{
+                $this->response([
+                    'status' => false,
+                    'message' => 'id not found'
+                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+            }
+        }
+
         public function cupKotor_get() {
             $produk = $this->pm->getcupKotor();
             if($produk){
@@ -171,6 +187,20 @@
 
         // post data
         public function index_post() {
+            $this->form_validation->set_rules(
+                'nama_produk',
+                'Nama Produk',
+                'trim|required|is_unique[produk.nama_produk]',
+                array('is_unique' => 'This %s already exists please enter another name product')
+            );
+            if ($this->form_validation->run() == FALSE) {
+                //form validation error
+                $message = array(
+                    'status' => false,
+                    'error' => $this->form_validation->error_array(),
+                );
+                $this->response($message, REST_Controller::HTTP_NOT_FOUND);
+            } else {
             $nama_produk=  $this->post('nama_produk');
             $this->load->library('ciqrcode'); //pemanggilan library QR CODE
 
@@ -210,6 +240,7 @@
                     
                 ], REST_Controller::HTTP_NOT_FOUND);
             }
+        }
         }
 
         // update data

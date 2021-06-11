@@ -271,13 +271,16 @@ class Peminjaman extends REST_Controller {
         // var_dump($id_cust);
         // $id_user = strip_tags($this->put('id_user'));
         // $id_produk = strip_tags($this->put('id_produk'));
-        // $id_mitra = strip_tags($this->put('id_mitra'));
+        $status = strip_tags($this->put('status'));
         $tanggal_pinjam = strip_tags($this->put('tanggal_pinjam'));
         $tanggal_haruskembali = strip_tags($this->put('tanggal_haruskembali'));
         // Validate the post data
-        if(!empty($id) || !empty($tanggal_pinjam) || !empty($tanggal_haruskembali)){
+        if(!empty($id) ||  !empty($status) || !empty($tanggal_pinjam) || !empty($tanggal_haruskembali)){
         //update user's account data
             $pinjamData = array();
+            if(!empty($status)){
+                $pinjamData['status'] = $status;
+            }
             if(!empty($tanggal_pinjam)){
                 $pinjamData['tanggal_pinjam'] = $tanggal_pinjam;
             }

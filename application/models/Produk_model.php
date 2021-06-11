@@ -11,7 +11,7 @@ if(!defined('BASEPATH')) exit('Hacking Attempt : Get Out of the system ..!');
         }
 
         public function getMitraprod($id) {
-            return $this->db->get_where('produk', ['id_mitra' => $id])->result_array();
+            return $this->db->get_where('produk', ['id_mitra' => $id, 'status' => 1])->result_array();
         }
 
         public function getMitraStok($id) {
